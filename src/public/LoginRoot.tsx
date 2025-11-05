@@ -1,0 +1,67 @@
+import React from 'react';
+import { graphql, loadQuery, usePreloadedQuery } from 'react-relay';
+import { StyledEngineProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ConnectedThemeProvider } from '../components/AppThemeProvider';
+import { ConnectedIntlProvider } from '../components/AppIntlProvider';
+import Login from './components/Login';
+import { environment } from '../relay/environment';
+import { LoginRootPublicQuery } from './__generated__/LoginRootPublicQuery.graphql';
+
+export const rootPublicQuery = graphql`
+  query LoginRootPublicQuery {
+    publicSettings {
+      platform_enterprise_edition_license_validated
+      platform_theme
+      platform_login_message
+      platform_consent_message
+      platform_banner_text
+      platform_banner_level
+      platform_consent_confirm_text
+      platform_theme_dark_logo_login
+      platform_theme_light_logo_login
+      platform_whitemark
+      platform_providers {
+        name
+        type
+        provider
+      }
+      playground_enabled
+      ...AppThemeProvider_settings
+      ...AppIntlProvider_settings
+      ...PublicSettingsProvider_settings
+      metrics_definition {
+        entity_type
+        metrics {
+          attribute
+          name
+        }
+      }
+    }
+  }
+`;
+
+const queryRef = loadQuery<LoginRootPublicQuery>(
+  environment,
+  rootPublicQuery,
+  {},
+);
+
+const LoginRoot = ({ type }: { type: string }) => {
+  const { publicSettings: settings } = usePreloadedQuery<LoginRootPublicQuery>(
+    rootPublicQuery,
+    queryRef,
+  );
+  return (
+    <StyledEngineProvider injectFirst={true}>
+      <ConnectedThemeProvider settings={settings}>
+        <CssBaseline />
+        <ConnectedIntlProvider settings={settings}>
+          <Login settings={settings} type={type} />
+        </ConnectedIntlProvider>
+      </ConnectedThemeProvider>
+    </StyledEngineProvider>
+  );
+};
+
+export default LoginRoot;
