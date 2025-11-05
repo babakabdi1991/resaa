@@ -8,19 +8,6 @@ import themeLight from './ThemeLight';
 import { useDocumentFaviconModifier, useDocumentThemeModifier } from '../utils/hooks/useDocumentModifier';
 import { AppThemeProvider_settings$data } from './__generated__/AppThemeProvider_settings.graphql';
 import RtlProvider from './RtlProvider';
-import locale from '../utils/BrowserLanguage';
-
-type PlatformLang =
-  | 'de-de'
-  | 'en-us'
-  | 'es-es'
-  | 'fr-fr'
-  | 'it-it'
-  | 'ja-jp'
-  | 'ko-kr'
-  | 'zh-cn'
-  | 'ru-ru'
-  | 'fa-IR';
 
 interface AppThemeProviderProps {
   children: React.ReactNode;
@@ -75,40 +62,26 @@ const AppThemeProvider: FunctionComponent<AppThemeProviderProps> = ({
   children,
   settings,
 }) => {
-  const { me, settings: contextSettings } = useContext<UserContextType>(UserContext);
+  const { me } = useContext<UserContextType>(UserContext);
   useDocumentFaviconModifier(settings?.platform_favicon);
-  
-  // Calculate language (same logic as AppIntlProvider)
-  // Try to get platform_language from settings prop first (from fragment),
-  // then fall back to contextSettings if available
-  const platformLanguage = (settings as any)?.platform_language ?? contextSettings?.platform_language ?? null;
-  const platformLang = platformLanguage !== null && platformLanguage !== 'auto' ? platformLanguage : locale;
-  const lang: PlatformLang = me?.language && me.language !== 'auto' ? (me.language as PlatformLang) : (platformLang as PlatformLang);
-  
-  // Determine direction based on language: RTL for Persian (fa-IR), LTR for others
-  // Normalize language code for comparison (handle case variations)
-  const normalizedLang = lang?.toLowerCase();
-  const isRtl = normalizedLang === 'fa-ir' || normalizedLang === 'fa_ir';
-  const direction = isRtl ? 'rtl' : 'ltr';
-  
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[AppThemeProvider] Language:', lang, 'normalized:', normalizedLang, 'isRtl:', isRtl, 'direction:', direction);
-    console.log('[AppThemeProvider] platformLanguage:', platformLanguage, 'me.language:', me?.language);
-  }
   
   // region theming
   const defaultTheme = settings?.platform_theme ?? null;
   const platformTheme = defaultTheme !== null && defaultTheme !== 'auto' ? defaultTheme : 'dark';
   const theme = me?.theme && me.theme !== 'default' ? me.theme : platformTheme;
   const themeComponent = themeBuilder(settings, theme);
-  const muiTheme = createTheme({ ...(themeComponent as ThemeOptions), direction });
+  
+  // Create theme with RTL direction always set
+  const muiTheme = createTheme({
+    ...(themeComponent as ThemeOptions),
+    direction: 'rtl',
+  });
   useDocumentThemeModifier(theme);
   // endregion
   
   return (
     <ThemeProvider theme={muiTheme}>
-      <RtlProvider isRtl={isRtl}>
+      <RtlProvider>
         {children}
       </RtlProvider>
     </ThemeProvider>
@@ -123,9 +96,6 @@ export const ConnectedThemeProvider = createFragmentContainer(
         platform_title
         platform_favicon
         platform_theme
-        ... on IntlSettings {
-          platform_language
-        }
         platform_theme_dark_background
         platform_theme_dark_paper
         platform_theme_dark_nav

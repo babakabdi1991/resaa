@@ -77,16 +77,12 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginRight: 4,
   },
   barRight: {
-    // marginRight: theme.spacing(2),
-    // marginLeft: theme.spacing(2),
     height: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'end',
-    // marginLeft: 'auto',
     marginRight: theme?.direction === 'rtl' ? 'auto' : theme.spacing(2),
     marginLeft: theme?.direction === 'rtl' ? theme.spacing(2) : 'auto'
-    // border:'2px solid red'
   },
   barRightContainer: {
     float: theme?.direction === 'rtl' ? 'right' : 'left' as 'left' | 'right'

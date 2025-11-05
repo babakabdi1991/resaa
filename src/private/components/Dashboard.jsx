@@ -59,8 +59,6 @@ const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     color: theme.palette.primary.main,
     top: 35,
-    // right: theme.direction === 'rtl' ? 'unset':20,
-    // left: theme.direction === 'rtl' ?  20 : 'unset',
     right:20
   },
 }));
@@ -189,7 +187,6 @@ const DefaultDashboard = ({ timeField }) => {
             classes={{ root: classes.card }}
             style={{ height: 110 }}
             variant="outlined"
-            // direction="rtl"
           >
             <CardContent >
               <div className={classes.title}>{t_i18n('Intrusion Sets')}</div>

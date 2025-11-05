@@ -246,7 +246,7 @@ const LeftBar = () => {
   const isGrantedToAudit = useGranted([SETTINGS_SECURITYACTIVITY]);
   const isGrantedToExplore = useGranted([EXPLORE]);
 
-  console.log('draftContext' , draftContext)
+  console.log('draftContext' , theme.direction)
 
   const anchors = {
     analyses: useRef(null),
